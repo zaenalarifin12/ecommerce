@@ -1,0 +1,28 @@
+docker-compose down --rmi all
+
+// create order service
+
+// transaction order
+
+- transaction
+- insert
+    - insert order
+    - insert data product order
+ - hit api cart [REMOVE CART]
+    # s
+        - remove cart from sql and save to redis ✔
+        - return cart data
+    # e
+        - return error
+ - hit api product
+    # s
+        - get all data product and then insert to order ✔
+
+commit
+Err
+    rollback tx
+    rollback cart [ROLLBACK REMOVE CART] ->
+    # s
+        get data from redis and then insert data to cart
+    # e
+        return error

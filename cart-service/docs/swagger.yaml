@@ -1,0 +1,207 @@
+basePath: /
+definitions:
+  domain.Cart:
+    properties:
+      createdAt:
+        type: string
+      productUUID:
+        type: string
+      quantity:
+        type: integer
+      updatedAt:
+        type: string
+      userUUID:
+        type: string
+      uuid:
+        type: string
+    type: object
+  domain.ErrorResponse:
+    properties:
+      error:
+        properties:
+          code:
+            type: integer
+          detail: {}
+          message:
+            type: string
+        type: object
+    type: object
+  dto.CartRequest:
+    properties:
+      product_id:
+        description: Product ID of the item to be added to the cart.
+        example: 6ba7b810-9dad-11d1-80b4-00c04fd430c8
+        type: string
+      quantity:
+        description: Quantity of the item to be added.
+        example: 1
+        type: integer
+    type: object
+host: localhost:5002
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Cart Service API
+  version: "1.0"
+paths:
+  /carts:
+    get:
+      consumes:
+      - application/json
+      description: List all products in the cart
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Cart'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      tags:
+      - Carts
+    post:
+      consumes:
+      - application/json
+      description: Add a product to the cart
+      parameters:
+      - description: Product details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CartRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Product added successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      tags:
+      - Carts
+  /carts/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a product from the cart
+      parameters:
+      - description: Product UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product removed successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      tags:
+      - Carts
+    put:
+      consumes:
+      - application/json
+      description: Update quantity of a product in the cart
+      parameters:
+      - description: Product UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Product quantity
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CartRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product quantity updated successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      tags:
+      - Carts
+  /carts/tx:
+    post:
+      consumes:
+      - application/json
+      description: Tx cart
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product tx successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      tags:
+      - TransactionCarts
+  /carts/tx-rollback:
+    post:
+      consumes:
+      - application/json
+      description: Tx Cart Rollback
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rollback Tx Successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      tags:
+      - TransactionCarts
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+tags:
+- name: Carts
+- name: TransactionCarts

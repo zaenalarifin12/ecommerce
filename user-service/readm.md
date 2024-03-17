@@ -1,0 +1,1 @@
+swag init --md ./docs --parseInternal  --parseDependency --parseDepth 2 -g api.go

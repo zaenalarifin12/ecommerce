@@ -1,0 +1,283 @@
+basePath: /api/v1
+definitions:
+  authDto.DataLoginResponse:
+    properties:
+      data:
+        $ref: '#/definitions/authDto.LoginResponse'
+    type: object
+  authDto.DataRegisterResponse:
+    properties:
+      data:
+        $ref: '#/definitions/authDto.RegisterResponse'
+    type: object
+  authDto.LoginRequest:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      password:
+        example: password123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  authDto.LoginResponse:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      full_name:
+        example: John Doe
+        type: string
+      phone:
+        example: "1234567890"
+        type: string
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMjM0NTY3ODkwLCJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20iLCJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTUxNjI0NTQyMn0.QxegqwOfs8A8U6bgthmZG9y2AmWJ2t9UcYY9rKiu2I8
+        type: string
+      username:
+        example: johndoe
+        type: string
+      uuid:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    type: object
+  authDto.RegisterRequest:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      full_name:
+        example: Babahaha
+        type: string
+      password:
+        example: password123
+        minLength: 8
+        type: string
+      phone:
+        example: "0897654545"
+        type: string
+      username:
+        example: johndoe
+        minLength: 5
+        type: string
+    required:
+    - email
+    - full_name
+    - password
+    - phone
+    - username
+    type: object
+  authDto.RegisterResponse:
+    properties:
+      email:
+        example: john@gmail.com
+        type: string
+      full_name:
+        example: John Doe
+        type: string
+      phone:
+        example: "1234567890"
+        type: string
+      username:
+        example: johndoe
+        type: string
+      uuid:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    type: object
+  domain.ErrorResponse:
+    properties:
+      error:
+        properties:
+          code:
+            type: integer
+          detail: {}
+          message:
+            type: string
+        type: object
+    type: object
+  userDto.DataUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/userDto.UserResponse'
+    type: object
+  userDto.UserResponse:
+    properties:
+      created_at:
+        example: "2024-02-29T12:00:00Z"
+        type: string
+      email:
+        example: john@example.com
+        type: string
+      email_verify_at:
+        type: string
+      full_name:
+        example: John Doe
+        type: string
+      phone:
+        example: "1234567890"
+        type: string
+      updated_at:
+        type: string
+      username:
+        example: johndoe
+        type: string
+      uuid:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    type: object
+host: localhost:5000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample user server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: User Service API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate User
+      parameters:
+      - description: ExampleValue
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/authDto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/authDto.DataLoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Authenticate User
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register User
+      parameters:
+      - description: ExampleValue
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/authDto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/authDto.DataRegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Register User
+      tags:
+      - auth
+  /users/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Users Detail by UUID
+      parameters:
+      - description: User uuid
+        in: path
+        name: uuid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userDto.DataUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Users Detail by UUID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update user detail by UUID
+      parameters:
+      - description: User UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userDto.DataUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Update user detail by UUID
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

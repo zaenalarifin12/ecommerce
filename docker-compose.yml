@@ -1,0 +1,174 @@
+version: '3.8'
+
+services:
+  postgres-cart:
+    container_name: db-cart-service
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: db-cart-service
+      POSTGRES_USER: db-cart-service
+      POSTGRES_PASSWORD: db-cart-service
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data-cart:/var/lib/postgresql/data
+    networks:
+      - my-network
+
+  mongodb:
+    container_name: my-mongodb
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data-product:/data/db
+    networks:
+      - my-network
+
+  postgres-user:
+    container_name: db-user-service
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: db-user-service
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data-user:/var/lib/postgresql/data
+    networks:
+      - my-network
+
+#  api-user:
+#    image: ecommerce-api-user:latest
+#    build:
+#      context: ./user-service
+#    environment:
+#      SERVER_HOST: localhost
+#      SERVER_PORT: 5000
+#      DB_SOURCE: postgres://user:user@postgres-user:5432/db-user-service?sslmode=disable
+#      MIGRATION_URL: file://db/migration
+#    ports:
+#      - "5000:5000"
+#    restart: always
+#    depends_on:
+#      - postgres-user
+#    networks:
+#      - my-network
+#  api-product:
+#    build:
+#      context: ./product-service
+#    environment:
+#      SERVER_HOST: localhost
+#      SERVER_PORT: 9091
+#      DB_SOURCE: mongodb://admin:admin@mongodb:27017/db-product-service
+#    ports:
+#      - "5001:5001"
+#    restart: always
+#    depends_on:
+#      - mongodb
+#    networks:
+#      - my-network
+#  api-cart:
+#    build:
+#      context: ./cart-service
+#    environment:
+#      SERVER_HOST: localhost
+#      SERVER_PORT: 9093
+#      DB_SOURCE: postgres://db-cart-service:db-cart-service@postgres-cart:5432/db-cart-service?sslmode=disable
+#      MIGRATION_URL: file://db/migration
+#    ports:
+#      - "5003:5003"
+#    restart: always
+#    depends_on:
+#      - postgres-cart
+#    networks:
+#      - my-network
+## util
+  redis-cart:
+    image: redis:7.2.4
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+    restart: always
+    volumes:
+      - redis_cart_data:/data
+  prometheus:
+    image: prom/prometheus:v2.40.7
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docs/prometheus.yml:/etc/prometheus/prometheus.yml
+  jaeger:
+    image: jaegertracing/all-in-one:1.40.0
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+
+#  otel-collector:
+#    image: otel/opentelemetry-collector-contrib:latest
+#    expose:
+#      - "4317"
+#    ports:
+#      - "1888:1888"   # pprof extension
+#      - "8888:8888"   # Prometheus metrics exposed by the collector
+#      - "8889:8889"   # Prometheus exporter metrics
+#      - "13133:13133" # health_check extension
+#      - "4317:4317"   # OTLP gRPC receiver
+#      - "55679:55679" # zpages extension
+#    volumes:
+#      - "${PWD}/hack/observability:/observability"
+#      - ./hack/observability/secrets/otel-collector.json:/etc/otel/key.json
+#    command: ["--config=/observability/otel-config.yaml", "${OTELCOL_ARGS}"]
+#    restart: always
+#    environment:
+#      - OTEL_NEW_RELIC_EXPORTER_OTLP_ENDPOINT=${OTEL_NEW_RELIC_EXPORTER_OTLP_ENDPOINT}
+#      - OTEL_NEW_RELIC_EXPORTER_API_KEY=${OTEL_NEW_RELIC_EXPORTER_API_KEY}
+#      - GOOGLE_APPLICATION_CREDENTIALS=/etc/otel/key.json
+#    depends_on:
+#      - jaeger
+#  grafana:
+#    image: grafana/grafana:7.1.5
+#    ports:
+#      - 3000:3000
+#    volumes:
+#      - ./hack/observability/grafana/provisioning:/etc/grafana/provisioning
+#      - ./hack/observability/grafana/dashboards:/etc/grafana/demo-dashboards
+#      - grafana_data:/var/lib/grafana
+#  prometheus:
+#    image: prom/prometheus:latest
+#    volumes:
+#      - ./hack/observability/prometheus.yaml:/etc/prometheus/prometheus.yml
+#      - prometheus_data:/prometheus
+#    ports:
+#      - "9090:9090"
+#  asynqmon:
+#    image: hibiken/asynqmon
+#    command:
+#      - "--redis-addr=redis:6379"
+#      - "--enable-metrics-exporter"
+#      - "--prometheus-addr=http://prometheus:9090"
+#    ports:
+#      - 8011:8080
+#
+#
+
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  postgres-data-cart:
+  postgres-data-user:
+  mongodb-data-product:
+  grafana_data:
+  prometheus_data:
+  redis_cart_data:
